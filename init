@@ -190,17 +190,26 @@ fi
 
 ### Main
 
-# Test if archiso is running
-
-if ! grep 'arch.*iso' /proc/cmdline >&3
+# Testing if arch-based iso is running
+iso=unknown
+if grep 'arch.*iso' /proc/cmdline >&3
 then
-    print "You are not running archiso, exiting."
+        iso=archiso
+fi
+if grep 'manjaro' /proc/cmdline >&3
+then
+        iso=miso
+fi
+
+if [[ "$iso" == "unknown" ]]
+then
+    print "You are not running a known arch-based iso, exiting."
     exit 1
 fi
 
 print "Increase cowspace to half of RAM"
 
-mount -o remount,size=50% /run/archiso/cowspace >&3
+mount -o remount,size=50% /run/${iso}/cowspace >&3
 
 # Init archzfs repository
 init_archzfs || exit 1
